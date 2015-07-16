@@ -15,7 +15,7 @@ int sum(list_t list)
   return list_first(list) + sum(list_rest(list));
 }
 
-int product(list_t list);
+int product(list_t list)
   /* 
   // EFFECTS: returns the product of each element in list
   //          one if the list is empty.
@@ -27,7 +27,7 @@ int product(list_t list);
   return list_first(list) * sum(list_rest(list));
 }
 
-int accumulate(list_t list, int (*fn)(int, int), int identity);
+int accumulate(list_t list, int (*fn)(int, int), int identity)
   /*
   // REQUIRES: fn must be associative.
   // EFFECTS: return identity if list is empty
@@ -53,7 +53,7 @@ int accumulate(list_t list, int (*fn)(int, int), int identity);
   return accumulate(list_rest(list), fn, identity);
 }
   
-list_t reverse(list_t list);
+list_t reverse(list_t list)
   /*
   // EFFECTS: returns the reverse of list
   //
@@ -66,39 +66,58 @@ list_t reverse(list_t list);
   return append(reverse(list_rest(list)), list_make(list_first(list), list_make()));
 }
   
-list_t append(list_t first, list_t second);
+list_t append(list_t first, list_t second)
   /*
   // EFFECTS: returns the list (first second)
   */ 
 {
-  struct list_node *lnp = list_checkValid(first);
-  while (lnp->rest) {
-    lnp = lnp->rest;
+  if (list_isEmpty(first)) {
+    return second;
   }
-  struct list_node *restp = list_checkValid(second);
-  lnp->rest = restp;
-  return first;
+  if (list_isEmpty(second)) {
+    return first;
+  }
+  struct list_node *lnp = list_checkValid(first);
+  lnp->ln_rest = append(list_rest(first),second);
+  return lnp;
 }
 
-list_t filter_odd(list_t list);
-    /*
-    // EFFECTS: returns a new list containing only the elements of the
-    //          original list which are odd in value, 
-    //          in the order in which they appeared in list.
-    //
-    // For example, if you applied filter_odd to the list ( 4 1 3 0 )
-    // you would get the list ( 1 3 )
-    */ 
+list_t filter_odd(list_t list)
+  /*
+  // EFFECTS: returns a new list containing only the elements of the
+  //          original list which are odd in value, 
+  //          in the order in which they appeared in list.
+  //
+  // For example, if you applied filter_odd to the list ( 4 1 3 0 )
+  // you would get the list ( 1 3 )
+  */
+{
+  if (list_isEmpty(list)) {
+    return list;
+  }
+  struct list_node *lnp = list_checkValid(list);
+  lnp->ln_rest = filter_odd(list_rest(list_rest(list)));
+  return lnp;
+}    
 
-list_t filter_even(list_t list);
-    /*
-    // EFFECTS: returns a new list containing only the elements of the
-    //          original list which are even in value, 
-    //          in the order in which they appeared in list.
-    //
-    // For example, if you applied filter_odd to the list ( 4 1 3 0 )
-    // you would get the list ( 4 0 )
-    */
+list_t filter_even(list_t list)
+  /*
+  // EFFECTS: returns a new list containing only the elements of the
+  //          original list which are even in value, 
+  //          in the order in which they appeared in list.
+  //
+  // For example, if you applied filter_odd to the list ( 4 1 3 0 )
+  // you would get the list ( 4 0 )
+  */
+{
+  if (list_isEmpty(list)) {
+    return list;
+  }
+  struct list_node *lnp = list_checkValid(list);
+  lnp = lnp->ln_rest;
+  lnp->ln_rest = filter_even(list_rest(list));
+  return lnp;
+}
 
 list_t filter(list_t list, bool (*fn)(int));
     /*
